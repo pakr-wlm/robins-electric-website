@@ -20,6 +20,7 @@
   --color-border: #e6ded0;
   --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-heading: "Oswald", var(--font-body);
+  --font-quote: "Playfair Display", Georgia, "Times New Roman", serif;
   --radius: 12px;
   --radius-pill: 999px;
   --shadow: 0 2px 10px rgba(0,0,0,.08);
@@ -50,6 +51,16 @@ a { color: inherit; }
 a:focus-visible, button:focus-visible, summary:focus-visible,
 input:focus-visible, textarea:focus-visible {
   outline: 2px solid var(--color-primary); outline-offset: 2px;
+}
+/* The transparent-over-photo nav state needs a white ring instead — a dark
+   maroon outline can disappear against a dark or busy patch of the hero
+   photo. Reverts to the brand-maroon ring the moment the nav goes solid. */
+.main-nav a:focus-visible, .main-nav button:focus-visible {
+  outline-color: #fff;
+}
+.site-header.is-scrolled .main-nav a:focus-visible,
+.site-header.is-scrolled .main-nav button:focus-visible {
+  outline-color: var(--color-primary);
 }
 
 /* Scroll-reveal: opacity + slight rise, disabled outright for reduced-motion.
@@ -99,34 +110,51 @@ input:focus-visible, textarea:focus-visible {
   .topbar { display: none; }
 }
 
+/* Transparent over the hero photo on load; solid the moment the page scrolls
+   (site-header.is-scrolled fires at 12px, per the script below) — an
+   immersive header like this reads as considerably more premium than an
+   always-opaque bar sitting on the hero from the first frame. */
 .main-nav {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; padding: 12px 20px;
+  gap: 16px; padding: 16px 20px;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: padding .2s ease, box-shadow .2s ease, background .25s ease, border-color .25s ease;
+}
+.site-header.is-scrolled .main-nav {
+  padding: 6px 20px; box-shadow: var(--shadow);
   background: rgba(255,255,255,.9);
   backdrop-filter: saturate(180%) blur(8px);
-  border-bottom: 1px solid var(--color-border);
-  transition: padding .2s ease, box-shadow .2s ease;
+  border-bottom-color: var(--color-border);
 }
-.site-header.is-scrolled .main-nav { padding: 6px 20px; box-shadow: var(--shadow); }
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .logo-badge {
   width: 76px; height: 76px; border-radius: 50%; overflow: hidden;
   position: relative; flex-shrink: 0; background: #fff;
-  box-shadow: inset 0 0 0 1px var(--color-border);
+  box-shadow: inset 0 0 0 1px var(--color-border), 0 2px 10px rgba(0,0,0,.35);
   transition: width .2s ease, height .2s ease;
 }
-.site-header.is-scrolled .logo-badge { width: 58px; height: 58px; }
+.site-header.is-scrolled .logo-badge { width: 58px; height: 58px; box-shadow: inset 0 0 0 1px var(--color-border); }
 .logo-badge img { width: 100%; height: 100%; object-fit: cover; }
 .logo-text {
   font-family: var(--font-heading); font-size: 22px; font-weight: 700;
   color: var(--color-primary); letter-spacing: -0.01em; text-transform: uppercase;
 }
 .nav-links { list-style: none; display: flex; gap: 24px; margin: 0; padding: 0; }
-.nav-links a { text-decoration: none; font-weight: 600; font-size: 15px; color: var(--color-text); }
-.nav-links a:hover { color: var(--color-primary); }
+.nav-links a { text-decoration: none; font-weight: 600; font-size: 15px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.4); }
+.nav-links a:hover { color: var(--color-accent); }
+.site-header.is-scrolled .nav-links a { color: var(--color-text); text-shadow: none; }
+.site-header.is-scrolled .nav-links a:hover { color: var(--color-primary); }
 .nav-ctas { display: flex; gap: 10px; }
-.nav-ctas .btn-outline { border-color: var(--color-primary); color: var(--color-primary); }
-.site-header { position: sticky; top: 0; z-index: 50; }
+.nav-ctas .btn-outline { border-color: #fff; color: #fff; }
+.site-header.is-scrolled .nav-ctas .btn-outline { border-color: var(--color-primary); color: var(--color-primary); }
+/* Absolute (not sticky) at load so the header has nothing behind it but the
+   hero photo instead of reserving its own flow space above it — that's what
+   makes the nav read as "floating over the photo" instead of "a white bar,
+   then a photo." Switches to fixed once scrolled so it still pins to the
+   viewport top like a normal sticky header for the rest of the page. */
+.site-header { position: absolute; top: 0; left: 0; right: 0; z-index: 50; }
+.site-header.is-scrolled { position: fixed; }
 
 /* Hamburger toggle — hidden on desktop, shown under the mobile breakpoint */
 .menu-toggle {
@@ -135,9 +163,11 @@ input:focus-visible, textarea:focus-visible {
   background: transparent; border: none; cursor: pointer; flex-shrink: 0;
 }
 .menu-toggle span {
-  display: block; width: 100%; height: 2px; background: var(--color-primary);
-  border-radius: 2px; transition: transform .2s ease, opacity .2s ease;
+  display: block; width: 100%; height: 2px; background: #fff;
+  border-radius: 2px; transition: transform .2s ease, opacity .2s ease, background .25s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,.4);
 }
+.site-header.is-scrolled .menu-toggle span { background: var(--color-primary); box-shadow: none; }
 .menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
@@ -173,39 +203,49 @@ input:focus-visible, textarea:focus-visible {
   .mobile-menu { display: none !important; }
 }
 
-/* ============ Hero ============ */
-.hero { background: var(--color-bg-alt); padding: 72px 0; overflow: hidden; }
-.hero-inner {
-  display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center;
+/* ============ Hero (full-bleed editorial treatment) ============
+   The photo is a full-bleed background layer, not a boxed image beside the
+   copy — a real customer review, not ad copy, carries the headline. Both are
+   deliberate departures from a "modern trade site" hero toward the more
+   premium/editorial register (see references/patterns.md, third addendum). */
+.hero { position: relative; overflow: hidden; min-height: 640px; display: flex; align-items: center; }
+.hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.hero-overlay {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(23,19,15,.6) 0%, rgba(23,19,15,.55) 45%, rgba(23,19,15,.82) 100%),
+    linear-gradient(100deg, rgba(23,19,15,.75) 0%, rgba(23,19,15,.35) 48%, rgba(23,19,15,.1) 80%);
 }
+/* Small editorial detail: a rotated label on the hero's edge, the kind of
+   near-zero-cost touch that reads as "someone with taste built this" rather
+   than a filled-in template. Desktop only — not enough width to spare on
+   a phone screen without crowding the actual content. */
+.hero-vertical-label {
+  position: absolute; z-index: 2; top: 50%; right: 28px; transform: translateY(-50%) rotate(180deg);
+  writing-mode: vertical-rl; text-transform: uppercase; letter-spacing: .22em;
+  font-size: 12px; font-weight: 700; color: rgba(255,255,255,.5);
+  pointer-events: none; display: none;
+}
+@media (min-width: 981px) { .hero-vertical-label { display: block; } }
+
+.hero-inner { position: relative; z-index: 2; padding: 130px 0 90px; }
+.hero-copy { max-width: 640px; }
 .eyebrow {
   text-transform: uppercase; letter-spacing: .08em; font-size: 13px;
-  font-weight: 700; color: var(--color-accent-dark); margin: 0 0 10px;
+  font-weight: 700; color: var(--color-accent); margin: 0 0 14px;
 }
-.hero h1 {
-  font-family: var(--font-heading); font-size: clamp(34px, 5.2vw, 58px);
-  line-height: 1.08; margin: 0 0 20px; color: var(--color-primary);
-  text-transform: uppercase; letter-spacing: -0.01em;
+.hero-quote {
+  font-family: var(--font-quote); font-style: italic; font-weight: 600;
+  font-size: clamp(26px, 3.6vw, 42px); line-height: 1.3; color: #fff; margin: 0 0 14px;
 }
-.hero h1 .h1-sub {
-  display: block; font-size: 0.46em; letter-spacing: 0;
-  color: var(--color-text-muted); font-weight: 500; margin-top: 6px;
+.hero-quote-cite {
+  display: block; color: var(--color-accent); font-weight: 700; font-size: 14px;
+  letter-spacing: .02em; margin: 0 0 22px;
 }
-.trust-bullets { list-style: none; margin: 0 0 28px; padding: 0; display: grid; gap: 10px; }
-.trust-bullets li { font-weight: 600; display: flex; align-items: center; gap: 10px; }
-.trust-bullets li svg {
-  width: 18px; height: 18px; flex-shrink: 0; fill: none;
-  stroke: var(--color-accent-dark); stroke-width: 2;
-}
-.trust-bullets li.licensed svg { stroke: var(--color-primary); }
+.hero-subhead { color: #f1e9dd; font-size: 17px; line-height: 1.65; margin: 0 0 30px; max-width: 480px; }
 .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
-
-.hero-media { position: relative; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-lift); }
-.hero-media img.stock-photo { width: 100%; min-height: 320px; max-height: 420px; object-fit: cover; }
-.hero-media::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(200deg, rgba(120,23,42,.35) 0%, rgba(23,19,15,.15) 45%, rgba(23,19,15,0) 70%);
-}
+.hero-ctas .btn-outline { border-color: #fff; color: #fff; }
+.hero-ctas .btn-outline:hover { background: rgba(255,255,255,.12); }
 
 .photo-placeholder {
   background: repeating-linear-gradient(45deg, #ece3d3, #ece3d3 12px, #f5efe3 12px, #f5efe3 24px);
@@ -217,7 +257,8 @@ input:focus-visible, textarea:focus-visible {
 }
 
 @media (max-width: 860px) {
-  .hero-inner { grid-template-columns: 1fr; }
+  .hero { min-height: 0; }
+  .hero-inner { padding: 100px 0 60px; }
 }
 
 /* ============ Trust stats bar (ghost-numeral treatment) ============ */
