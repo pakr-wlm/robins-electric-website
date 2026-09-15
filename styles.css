@@ -45,6 +45,13 @@ a { color: inherit; }
 }
 .skip-link:focus { left: 10px; top: 10px; }
 
+/* Brand-colored keyboard focus ring, everywhere — replaces the mismatched
+   browser-default blue so focus is always visible without clashing. */
+a:focus-visible, button:focus-visible, summary:focus-visible,
+input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--color-primary); outline-offset: 2px;
+}
+
 /* Scroll-reveal: opacity + slight rise, disabled outright for reduced-motion.
    Motion is decoration only — never applied to phone numbers or CTAs. */
 .reveal { opacity: 0; transform: translateY(16px); transition: opacity .5s ease, transform .5s ease; }
@@ -376,7 +383,9 @@ img.stock-photo.gallery-photo:hover { transform: translateY(-4px); box-shadow: v
 /* ============ Contact ============ */
 .contact { background: var(--color-bg); padding: 76px 0; text-align: center; }
 .contact-inner { max-width: 520px; margin: 0 auto; }
-.contact-form { display: grid; gap: 12px; margin-top: 20px; text-align: left; }
+.contact-form { display: grid; gap: 14px; margin-top: 20px; text-align: left; }
+.contact-form .field { display: grid; gap: 5px; }
+.contact-form label { font-size: 13px; font-weight: 700; color: var(--color-text-muted); }
 .contact-form input, .contact-form textarea {
   padding: 13px 15px; border: 1px solid var(--color-border); border-radius: var(--radius);
   font-family: inherit; font-size: 15px;
