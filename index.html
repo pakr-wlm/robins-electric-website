@@ -287,7 +287,12 @@ input:focus-visible, textarea:focus-visible {
 
 @media (max-width: 860px) {
   .hero { min-height: 0; }
-  .hero-inner { padding: 100px 0 60px; }
+  /* The transparent header is ~109px tall on mobile (logo + nav padding) but
+     sits on top of the hero via z-index rather than pushing it down in flow —
+     100px of top padding here was actually LESS than the header's own height,
+     so the eyebrow text started underneath it with zero clearance. 150px
+     clears the header with real breathing room to spare. */
+  .hero-inner { padding: 150px 0 70px; }
 }
 
 /* ============ Trust stats bar (ghost-numeral treatment) ============ */
