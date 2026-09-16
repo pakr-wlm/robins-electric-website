@@ -268,6 +268,17 @@ input:focus-visible, textarea:focus-visible {
   .hero-inner { padding-top: 150px; padding-bottom: 70px; }
 }
 
+/* Anchor targets need scroll-margin-top so the CTA jump (#services, #contact)
+   doesn't land the section heading underneath the fixed scrolled header —
+   confirmed by measuring getBoundingClientRect() after a real anchor jump:
+   without this, the section's top edge lands flush at viewport y=0, exactly
+   where the ~100px fixed header sits. Smaller offset under 640px since the
+   topbar is hidden and the scrolled nav bar is shorter there. */
+#main, #services, #about, #reviews, #service-area, #contact { scroll-margin-top: 112px; }
+@media (max-width: 640px) {
+  #main, #services, #about, #reviews, #service-area, #contact { scroll-margin-top: 78px; }
+}
+
 /* ============ Trust stats bar (ghost-numeral treatment) ============ */
 .stats-bar { background: var(--color-ink); color: #fff; padding: 44px 0; }
 .stats-grid {
